@@ -12,17 +12,51 @@ var Numbers;
 var Errors;
 
 var keywords = [
-    ['function', 1],
+    ['func', 1],
     ['return', 2],
-    ['var', 3],
-    ['if', 4],
-    ['else', 5],
-    ['while', 6],
-    ['for', 7],
-    ['switch', 8],
-    ['case', 9],
-    ['break', 10]
+    ['if', 3],
+    ['else', 4],
+    ['for', 5],
+    ['switch', 6],
+    ['case', 7],
+    ['break', 8],
+    ['default', 9],
+    ['var', 10],
+    ['bool', 11],
+    ['int', 12],
+    ['float', 13],
+    ['string', 14],
+    ['fmt.Print', 15],
+    ['fmt.Scan', 16],
+    ['fmt.Pow', 17],
+    ['fmt.Sqrt', 18]
 ];
+
+var symbols = [
+    ['{',30,0],
+    ['}',30,1],
+    ['==',31,0],
+    ['<',31,1],
+    ['>',31,2],
+    ['<=',31,3],
+    ['>=',31,4],
+    ['+',32,0],
+    ['-',32,1],
+    ['*',32,2],
+    ['/',32,3],
+    ['%',32,4],
+    ['!',33,0],
+    ['&&',33,1],
+    ['||',33,2],
+    ['[',34,0],
+    [']',34,1],
+    ['(',35,0],
+    [')',35,1],
+    ['=',36,0],
+    [',',37,0]
+];
+
+document.getElementById("source").innerHTML = "func main() {\nfmt.Print(\"Hello World\")\n}";
 
 // Получаем данные с окна и начинаем трансляцию
 document.getElementById("startBtn").addEventListener("click", function (event) {
@@ -71,10 +105,11 @@ function Lexer() {
                 console.log("Symbol - \'" + symbol + "\' is Apostrophe");
                 index = parseStr(index);
             } else // Если идентфикаторы и символы
-            if (isLetter(symbol)) {   // Если буква
+            if (isLetter(symbol) || symbol == "_") {   // Если буква
                 console.log("Symbol - \'" + symbol + "\' is Letter");
                 index = parseIdnt(index);
             } else {    // Если не буква
+                console.log("Symbol - \'" + symbol + "\' is no Letter");
                 index = parseSymbol(index);
             }
         }
@@ -93,7 +128,7 @@ function isNumber(str) {
 
 function isApostrophe(str) {
     if(str) {
-        var match = str.match(/[\'|\"]/g);
+        var match = str.match(/[\"]/g);
         if (match) {
             return (str.length != 0 && match.length == str.length) ? true : false;
         }
@@ -114,13 +149,14 @@ function isLetter(str) {
 function parseNumber(index){
     var lexem = '';
     var symbol = source[strIndex][index];
+    var firstEntry = index;
 
-    while(isNumber(symbol)) {
+    do {
         lexem += symbol;
         index++;
         symbol = source[strIndex][index];
-    }
-    var item = [lexem, 26, strIndex];
+    } while(isNumber(symbol));
+    var item = [lexem, 50, 0, strIndex, firstEntry];
     Lexemes.push(item);
     if(!isLexemeExists(item,Numbers))
         Numbers.push(item);
@@ -133,6 +169,7 @@ function parseStr(index) {
     var item;
     var startSymbol = source[strIndex][index++];
     var symbol = source[strIndex][index];
+    var firstEntry = index;
 
     if(symbol) {
         while (!isApostrophe(symbol) && index < source[strIndex].length) {
@@ -141,12 +178,12 @@ function parseStr(index) {
             symbol = source[strIndex][index];
         }
         if (symbol == startSymbol) {
-            item = [lexem, 27, strIndex];
+            item = [lexem, 51, 0, strIndex, firstEntry];
             Lexemes.push(item);
             if (!isLexemeExists(item, Strings))
                 Strings.push(item);
         } else {
-            item = [lexem, "quotes are not closed", strIndex];
+            item = [lexem, "quotes are not closed", strIndex, firstEntry];
             Errors.push(item);
         }
     }
@@ -156,22 +193,46 @@ function parseStr(index) {
 function parseIdnt(index) {
     var lexem = '';
     var symbol = source[strIndex][index];
+    var firstEntry = index;
 
-    while(isLetter(symbol) || isNumber(symbol)) {
+    do {
         lexem += symbol;
         index++;
         symbol = source[strIndex][index];
-    }
+    } while(isLetter(symbol) || isNumber(symbol) || symbol == '.');
     for(var i = 0;i<keywords.length;i++) {
         if(keywords[i][0] == lexem) {
-            var item = [lexem, keywords[i][1], strIndex];
+            var item = [lexem, keywords[i][1], 0, strIndex, firstEntry];
             Lexemes.push(item);
+            return index-1;
         }
     }
-    return index;
+    var item = [lexem, 40, 0, strIndex, firstEntry];
+    Lexemes.push(item);
+    if(!isLexemeExists(item, Identifiers))
+        Identifiers.push(item);
+    return index-1;
 }
 
 function parseSymbol(index) {
+    var symbol = source[strIndex][index];
+    var firstEntry = index;
+
+    for(var i = 0;i<symbols.length;i++) {
+        if(symbols[i][0] == symbol) {
+            var item = [symbol, symbols[i][1], symbols[i][2], strIndex, firstEntry];
+            Lexemes.push(item);
+            return index;
+        } else if(symbols[i][0] == symbol+source[strIndex][index+1]) {
+            var item = [symbol+source[strIndex][index+1], symbols[i][1], symbols[i][2], strIndex, firstEntry];
+            Lexemes.push(item);
+            return index;
+        } else if(symbol == ' ' || symbol == '\r' || symbol == '\t') {
+            return index;
+        }
+    }
+    var item = [symbol, "illegal symbol", strIndex, firstEntry];
+    Errors.push(item);
     return index;
 }
 
