@@ -1,45 +1,45 @@
-/**
+п»ї/**
  * Created by Dmitry on 25.09.2015.
  */
 
-// Выполняем этот код после загрузки окна
+// Р’С‹РїРѕР»РЅСЏРµРј СЌС‚РѕС‚ РєРѕРґ РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё РѕРєРЅР°
 window.addEventListener("load", function() {
-    // Добавляем простой пример языка Go в textarea
+    // Р”РѕР±Р°РІР»СЏРµРј РїСЂРѕСЃС‚РѕР№ РїСЂРёРјРµСЂ СЏР·С‹РєР° Go РІ textarea
     document.getElementById("source").innerHTML = "func main() {\nvar x int\nvar y string\nfmt.Scan(&y)\nx = 10\nfor x!=0 {\nfmt.Print(y)\nx=x-1\n}\nfmt.Print(\"Hello World\")\n}";
 
-    // Получаем данные с окна и начинаем трансляцию
+    // РџРѕР»СѓС‡Р°РµРј РґР°РЅРЅС‹Рµ СЃ РѕРєРЅР° Рё РЅР°С‡РёРЅР°РµРј С‚СЂР°РЅСЃР»СЏС†РёСЋ
     document.getElementById("startBtn").addEventListener("click", function (event) {
         console.log("Translator - Start");
 
-        // Транслятор
-        var source = document.getElementById("source").value.split('\n');   // Исходный код транслируемого языка
-        var translator = new Translator(source);                            // Экземпляр транслятора
+        // РўСЂР°РЅСЃР»СЏС‚РѕСЂ
+        var source = document.getElementById("source").value.split('\n');   // РСЃС…РѕРґРЅС‹Р№ РєРѕРґ С‚СЂР°РЅСЃР»РёСЂСѓРµРјРѕРіРѕ СЏР·С‹РєР°
+        var translator = new Translator(source);                            // Р­РєР·РµРјРїР»СЏСЂ С‚СЂР°РЅСЃР»СЏС‚РѕСЂР°
 
-        // Вывод...
+        // Р’С‹РІРѕРґ...
         var errorsStr = document.getElementById("errors");
         errorsStr.innerHTML = '';
         for(var i = 0; i<translator.Errors.length;i++) {
             errorsStr.innerHTML += "<p>Error: "+translator.Errors[i][1]+" - line: "+translator.Errors[i][2]+" index: "+translator.Errors[i][3]+"</p>";
         }
-        //...Таблица лексем
+        //...РўР°Р±Р»РёС†Р° Р»РµРєСЃРµРј
         var lexemesTable = document.getElementById("lexemesTable");
         lexemesTable.innerHTML = "<tr><td>Lexeme</td><td>Type</td><td>Line</td></tr>";
         for(var i = 0; i<translator.Lexemes.length;i++) {
             lexemesTable.innerHTML += "<tr><td>"+translator.Lexemes[i][0]+"</td><td>"+translator.Lexemes[i][1]+'.'+translator.Lexemes[i][2]+"</td><td>"+translator.Lexemes[i][3]+"</td></tr>";
         }
-        //...Таблица идентификаторов
+        //...РўР°Р±Р»РёС†Р° РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
         var identifiersTable = document.getElementById("identifiersTable");
         identifiersTable.innerHTML = "<tr><td>Identifier</td><td>Line</td></tr>";
         for(var i = 0; i<translator.Identifiers.length;i++) {
             identifiersTable.innerHTML += "<tr><td>"+translator.Identifiers[i][0]+"</td><td>"+translator.Identifiers[i][3]+"</td></tr>";
         }
-        //...Таблица строк
+        //...РўР°Р±Р»РёС†Р° СЃС‚СЂРѕРє
         var stringsTable = document.getElementById("stringsTable");
         stringsTable.innerHTML = "<tr><td>String</td><td>Line</td></tr>";
         for(var i = 0; i<translator.Strings.length;i++) {
             stringsTable.innerHTML += "<tr><td>"+translator.Strings[i][0]+"</td><td>"+translator.Strings[i][3]+"</td></tr>";
         }
-        //..Таблица чисел
+        //..РўР°Р±Р»РёС†Р° С‡РёСЃРµР»
         var numbersTable = document.getElementById("numbersTable");
         numbersTable.innerHTML = "<tr><td>Number</td><td>Line</td></tr>";
         for(var i = 0; i<translator.Numbers.length;i++) {
@@ -49,9 +49,9 @@ window.addEventListener("load", function() {
 });
 
 /*
- * Расщирение функционала стандартных объектов
+ * Р Р°СЃС‰РёСЂРµРЅРёРµ С„СѓРЅРєС†РёРѕРЅР°Р»Р° СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РѕР±СЉРµРєС‚РѕРІ
  */
-// Метод провряющий, состоит ли строка из чисел
+// РњРµС‚РѕРґ РїСЂРѕРІСЂСЏСЋС‰РёР№, СЃРѕСЃС‚РѕРёС‚ Р»Рё СЃС‚СЂРѕРєР° РёР· С‡РёСЃРµР»
 String.prototype.isNumber = function (){
     var match = this.match(/[0-9]/gi);
     if (match) {
@@ -60,7 +60,7 @@ String.prototype.isNumber = function (){
     return false;
 }
 
-// Метод проверяющий, состоит ли строка из апострофов
+// РњРµС‚РѕРґ РїСЂРѕРІРµСЂСЏСЋС‰РёР№, СЃРѕСЃС‚РѕРёС‚ Р»Рё СЃС‚СЂРѕРєР° РёР· Р°РїРѕСЃС‚СЂРѕС„РѕРІ
 String.prototype.isApostrophe = function () {
     var match = this.match(/[\"]/g);
     if (match) {
@@ -69,7 +69,7 @@ String.prototype.isApostrophe = function () {
     return false;
 }
 
-// Метод проверяющий, состоит ли строка из латинских букв
+// РњРµС‚РѕРґ РїСЂРѕРІРµСЂСЏСЋС‰РёР№, СЃРѕСЃС‚РѕРёС‚ Р»Рё СЃС‚СЂРѕРєР° РёР· Р»Р°С‚РёРЅСЃРєРёС… Р±СѓРєРІ
 String.prototype.isLetter = function () {
     var match = this.match(/[A-Z]/gi);
     if (match) {
@@ -78,7 +78,7 @@ String.prototype.isLetter = function () {
     return false;
 }
 
-// Проверяем, есть ли такой item в массиве
+// РџСЂРѕРІРµСЂСЏРµРј, РµСЃС‚СЊ Р»Рё С‚Р°РєРѕР№ item РІ РјР°СЃСЃРёРІРµ
 Array.prototype.itemExists = function (item){
     for(var i = 0; i<this.length;i++) {
         if(this[i] == item) {
