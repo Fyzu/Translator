@@ -1,27 +1,27 @@
-п»ї/**
+/**
  * Created by Dmitry on 25.09.2015.
  */
 
-// Р›РµРєСЃРёС‡РµСЃРєРёР№ Р°РЅР°Р»РёР·Р°С‚РѕСЂ
+// Лексический анализатор
 Translator.prototype.Lexer = function () {
 
     /*
-     * РњРµС‚РѕРґС‹ Lexer'Р°
+     * Методы Lexer'а
      */
-    // Р Р°Р·Р±РѕСЂ С†РµР»РѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
+    // Разбор целой константы
     this.parseNumber = function(index){
-        var lexem = '';                         // РџРѕР»СѓС‡Р°РµРјР°СЏ Р»РµРєСЃРµРјР°
-        var symbol = this.source[this.strIndex][index];   // РћР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹Р№ СЃРёРјРІРѕР»
-        var firstEntry = index;                 // РРЅРґРµРєСЃ РїРµСЂРІРѕРіРѕ РІС…РѕР¶РґРµРЅРёСЏ
+        var lexem = '';                                     // Получаемая лексема
+        var symbol = this.source[this.strIndex][index];     // Обрабатываемый символ
+        var firstEntry = index;                             // Индекс первого вхождения
 
-        // РџРѕР»СѓС‡Р°РµРј Р»РµРєСЃРµРјСѓ С†РµР»РёРєРѕРј
+        // Получаем лексему целиком
         do {
             lexem += symbol;
             index++;
             symbol = this.source[this.strIndex][index];
         } while(index<this.source[this.strIndex].length && symbol.isNumber());
 
-        // Р”РѕР±Р°РІР»СЏРµРј РїРѕР»СѓС‡РµРЅРЅСѓСЋ Р»РµРєСЃРµРјСѓ РІ РјР°СЃСЃРёРІС‹
+        // Добавляем полученную лексему в массивы
         var item = [lexem, 50, 0, this.strIndex, firstEntry];
         this.Lexemes.push(item);
         this.Numbers.push(item);
@@ -29,26 +29,27 @@ Translator.prototype.Lexer = function () {
         return index-1;
     }
 
-    // Р Р°Р·Р±РѕСЂ СЃС‚СЂРѕРєРѕРІРѕР№ РєРѕРЅСЃС‚Р°РЅС‚С‹
+    // Разбор строковой константы
     this.parseStr = function(index) {
-        var lexem = '';                                 // РџРѕР»СѓС‡Р°РµРјР°СЏ Р»РµРєСЃРµРјР°
-        var startSymbol = this.source[this.strIndex][index++];    // РќР°С‡Р°Р»СЊРЅС‹Р№ СЃРёРјРІРѕР»
-        var symbol = this.source[this.strIndex][index];           // РћР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹Р№ СЃРёРјРІРѕР»
-        var firstEntry = index;                         // РџРµСЂРІРѕРµ РІС…РѕР¶РґРµРЅРёРµ Р»РµРєСЃРµРјС‹
+        var lexem = '';                                             // Получаемая лексема
+        var startSymbol = this.source[this.strIndex][index++];      // Начальный символ
+        var symbol = this.source[this.strIndex][index];             // Обрабатываемый символ
+        var firstEntry = index;                                     // Первое вхождение лексемы
 
-        if(symbol) {    // Р•СЃР»Рё СЃРёРјРІРѕР» РЅРµ РЅСѓР»РµРІРѕР№
-            // РџРѕР»СѓС‡Р°РµРј РїРѕР»РЅСѓСЋ Р»РµРєСЃРµРјСѓ
-            while (index < this.source[this.strIndex].length && !symbol.isApostrophe() ) {
+        console.log(this.source[this.strIndex]);
+        if(symbol) {    // Если символ не нулевой
+            // Получаем полную лексему
+            while (index < this.source[this.strIndex].length && (!symbol.isApostrophe() || this.source[this.strIndex][index-1] == '\\')) {
                 lexem += symbol;
                 index++;
                 symbol = this.source[this.strIndex][index];
             }
-            // РџСЂРѕРІРµСЂСЏРµРј, Р·Р°РєСЂС‹С‚Р° Р»Рё СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°
-            if (symbol == startSymbol) {    // Р•СЃР»Рё РґР°, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј РІ РјР°СЃСЃРёРІ
+            // Проверяем, закрыта ли строковая константа
+            if (symbol == startSymbol) {    // Если да, то добавляем в массив
                 var item = [lexem, 51, 0, this.strIndex, firstEntry];
                 this.Lexemes.push(item);
                 this.Strings.push(item);
-            } else {    // Р•СЃР»Рё РЅРµС‚, С‚Рѕ СЃРѕРѕР±С‰Р°РµРј РѕР± РѕС€РёР±РєРµ
+            } else {    // Если нет, то сообщаем об ошибке
                 var item = [lexem, "quotes are not closed", this.strIndex, firstEntry];
                 this.Errors.push(item);
             }
@@ -57,20 +58,20 @@ Translator.prototype.Lexer = function () {
         return index;
     }
 
-    // Р Р°Р·Р±РѕСЂ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
+    // Разбор идентификаторов
     this.parseIdnt = function(index) {
-        var lexem = '';                         // РџРѕР»СѓС‡Р°РµРјР°СЏ Р»РµРєСЃРµРјР°
-        var symbol = this.source[this.strIndex][index];   // РћР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹Р№ СЃРёРјРІРѕР»
-        var firstEntry = index;                 // РџРµСЂРІРѕРµ РІС…РѕР¶РґРµРЅРёРµ Р»РµРєСЃРµРјС‹
+        var lexem = '';                                     // Получаемая лексема
+        var symbol = this.source[this.strIndex][index];     // Обрабатываемый символ
+        var firstEntry = index;                             // Первое вхождение лексемы
 
-        // РџРѕР»СѓС‡РµРј РїРѕР»РЅСѓСЋ Р»РµРєСЃРµРјСѓ
+        // Получем полную лексему
         do {
             lexem += symbol;
             index++;
             symbol = this.source[this.strIndex][index];
         } while(index<this.source[this.strIndex].length && (symbol.isLetter() || symbol.isNumber() || symbol == '.'));
 
-        // РџСЂРѕРІРµСЂСЏРµРј СЏРІР»СЏРµС‚СЃСЏ Р»Рё Р»РµРєСЃРµРјР° РєР»СЋС‡РµРІС‹Рј СЃР»РѕРІРѕРј
+        // Проверяем является ли лексема ключевым словом
         for(var i = 0;i<this.keywords.length;i++) {
             if(this.keywords[i][0] == lexem) {
                 var item = [lexem, this.keywords[i][1], 0, this.strIndex, firstEntry];
@@ -79,7 +80,7 @@ Translator.prototype.Lexer = function () {
                 return index-1;
             }
         }
-        // Р•СЃР»Рё Р»РµРєСЃРµРјР° РЅРµ РєР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ, С‚Рѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
+        // Если лексема не ключевое слово, то идентификатор
         var item = [lexem, 40, 0, this.strIndex, firstEntry];
         this.Lexemes.push(item);
         this.Identifiers.push(item);
@@ -87,12 +88,12 @@ Translator.prototype.Lexer = function () {
         return index-1;
     }
 
-    // Р Р°Р·Р±РѕСЂ СЃРёРјРІРѕР»Р°
+    // Разбор символа
     this.parseSymbol = function(index) {
-        var symbol = this.source[this.strIndex][index];   // РћР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹Р№ СЃРёРјРІРѕР»
-        var firstEntry = index;                 // РџРµСЂРІРѕРµ РІС…РѕР¶РґРµРЅРёРµ СЃРёРјРІРѕР»Р°
+        var symbol = this.source[this.strIndex][index];     // Обрабатываемый символ
+        var firstEntry = index;                             // Первое вхождение символа
 
-        // РџСЂРѕРІРµСЂСЏРµРј, РєРѕСЂСЂРµРєС‚РЅС‹Р№ Р»Рё СЃРёРјРІРѕР»
+        // Проверяем, корректный ли символ
         for(var i = 0;i<this.symbols.length;i++) {
             if(this.symbols[i][0] == symbol) {
                 var item = [symbol, this.symbols[i][1], this.symbols[i][2], this.strIndex, firstEntry];
@@ -105,7 +106,7 @@ Translator.prototype.Lexer = function () {
             }
         }
 
-        // Р•СЃР»Рё СЃРёРјРІРѕР» РЅРµ РєРѕСЂСЂРµРєС‚РЅС‹Р№, С‚Рѕ СЃРѕРѕР±С‰Р°РµРј РѕР± РѕС€РёР±РєРµ
+        // Если символ не корректный, то сообщаем об ошибке
         var item = [symbol, "illegal symbol", this.strIndex, firstEntry];
         this.Errors.push(item);
 
@@ -114,31 +115,31 @@ Translator.prototype.Lexer = function () {
 
 
     /*
-     * РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Lexer'Р°
+     * Конструктор Lexer'а
      */
 
-    // РџСЂРѕРІРµСЂСЏРµРј, РЅРµ РїСѓСЃС‚РѕР№ Р»Рё РёСЃС…РѕРґРЅС‹Р№ РєРѕРґ РїРѕР»СѓС‡РёР»Рё РјС‹
+    // Проверяем, не пустой ли исходный код получили мы
     if(!this.source || this.source.length == 0) {
         return;
     }
 
-    // РџРѕСЃРёРјРІРѕР»СЊРЅС‹Р№ СЂР°Р·Р±РѕСЂ РёСЃС…РѕРґРЅРѕРіРѕ РєРѕРґР°
+    // Посимвольный разбор исходного кода
     for(this.strIndex = 0;this.strIndex<this.source.length;this.strIndex++) {
         for (var index = 0; index < this.source[this.strIndex].length; index++) {
             var symbol = this.source[this.strIndex][index];
-            if (symbol.isNumber()) {    // Р•СЃР»Рё С‡РёСЃР»Рѕ
+            if (symbol.isNumber()) {    // Если число
                 console.log("Symbol - \'" + symbol + "\' is Number");
                 index = this.parseNumber(index);
-            } else if (symbol.isApostrophe()) {   // Р•СЃР»Рё Р°РїРѕСЃС‚СЂРѕС„(РЅР°С‡Р°Р»Рѕ СЃС‚СЂРѕРєРё)
+            } else if (symbol.isApostrophe()) {   // Если апостроф(начало строки)
                 console.log("Symbol - \'" + symbol + "\' is Apostrophe");
                 index = this.parseStr(index);
-            } else // Р•СЃР»Рё РёРґРµРЅС‚С„РёРєР°С‚РѕСЂС‹ Рё СЃРёРјРІРѕР»С‹
-            if (symbol.isLetter() || symbol == "_") {   // Р•СЃР»Рё Р±СѓРєРІР°
+            } else // Если идентфикаторы и символы
+            if (symbol.isLetter() || symbol == "_") {   // Если буква
                 console.log("Symbol - \'" + symbol + "\' is Letter");
                 index = this.parseIdnt(index);
             } else if (symbol == ' ' || symbol == '\r' || symbol == '\t') {
                 continue;
-            } else {    // Р•СЃР»Рё РЅРµ Р±СѓРєРІР°
+            } else {    // Если не буква
                 console.log("Symbol - \'" + symbol + "\' is no Letter");
                 index = this.parseSymbol(index);
             }
