@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="src/style/style.css" type="text/css" media="all">
     <script src="src/translator/translator.js"></script>
     <script src="src/translator/lexer.js"></script>
+    <script src="src/translator/parser.js"></script>
     <script src="src/gui.js"></script>
 </head>
 <body>
@@ -28,7 +29,7 @@
 <table width="40%">
     <tr>
         <td>
-            <details>
+            <details open>
                 <summary>Errors</summary>
                 <p id="errors"></p>
             </details>
@@ -36,28 +37,28 @@
     </tr>
     <tr>
         <td valign="top">
-        <details>
-            <summary>Lexemes Table</summary>
-            <table id="lexemesTable">
-            </table>
-        </details>
+            <details open>
+                <summary>Lexemes Table</summary>
+                <table id="lexemesTable">
+                </table>
+            </details>
         </td>
         <td valign="top">
-            <details>
+            <details open>
                 <summary>Identifiers Table</summary>
                 <table id="identifiersTable">
                 </table>
             </details>
         </td>
         <td valign="top">
-            <details>
+            <details open>
                 <summary>Strings Table</summary>
                 <table id="stringsTable">
                 </table>
             </details>
         </td>
         <td valign="top">
-            <details>
+            <details open>
                 <summary>Numbers Table</summary>
                 <table id="numbersTable">
                 </table>

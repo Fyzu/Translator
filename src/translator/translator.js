@@ -5,14 +5,14 @@
 // Транслятор
 function Translator(source) {
     // Список переменных
-    this.source = source;   // Транслируемый язык
+    this.source = source;       // Транслируемый язык
     this.strIndex = 0;          // Индекс текущей строки
-    this.Lexemes = [];           // Массив лексем
-    this.Identifiers = [];       // Массив идентификаторов
-    this.Strings = [];           // Массив строк
-    this.Numbers = [];           // Массив чисел
-    this.Errors = [];            // Массив ошибок
-    this.keywords = [       // Таблица ключевых слов
+    this.Lexemes = [];          // Массив лексем
+    this.Identifiers = [];      // Массив идентификаторов
+    this.Strings = [];          // Массив строк
+    this.Numbers = [];          // Массив чисел
+    this.Errors = [];           // Массив ошибок
+    this.keywords = [           // Таблица ключевых слов
         ['func',1],
         ['main',2],
         ['return',3],
@@ -59,7 +59,7 @@ function Translator(source) {
     ];
 
     this.Lexer();   // Лексический анализатор
-    // Синтаксический анализатор - WIP
+    //this.Parser();  // Синтаксический анализатор - WIP
     // Генератор кода - WIP
 
 }

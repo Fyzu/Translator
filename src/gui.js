@@ -5,7 +5,7 @@
 // Выполняем этот код после загрузки окна
 window.addEventListener("load", function() {
     // Добавляем простой пример языка Go в textarea
-    document.getElementById("source").innerHTML = "func main() {\nvar x int\nvar y string\nfmt.Scan(&y)\nx = 10\nfor x!=0 {\nfmt.Print(y)\nx=x-1\n}\nfmt.Print(\"Hello World\")\n}";
+    document.getElementById("source").innerHTML = "func main() {\nvar x,z,c int\nvar y,t string\nfmt.Scan(&y)\nx = 10\nfor x!=0 {\nfmt.Print(y)\nx=x-1\n}\nfmt.Print(\"Hello World\")\n}";
 
     // Получаем данные с окна и начинаем трансляцию
     document.getElementById("startBtn").addEventListener("click", function (event) {
