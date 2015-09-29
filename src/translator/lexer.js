@@ -21,7 +21,7 @@ Translator.prototype.Lexer = function () {
             symbol = this.source[this.strIndex][index];
             console.log(lexem);
             console.log(lexem.match(/[.]/g));
-        } while(index<this.source[this.strIndex].length && lexem.count('.') < 2 && (symbol.isNumber() || symbol == '.'));
+        } while(index<this.source[this.strIndex].length && (symbol.isNumber() || (symbol == '.' && lexem.count('.') != 1)));
 
         // Добавляем полученную лексему в массивы
         var item = [lexem, (lexem.count('.'))? 52:50, 0, this.strIndex, firstEntry];
@@ -70,7 +70,7 @@ Translator.prototype.Lexer = function () {
             lexem += symbol;
             index++;
             symbol = this.source[this.strIndex][index];
-        } while(index<this.source[this.strIndex].length && (symbol.isLetter() || symbol.isNumber() || symbol == '.'));
+        } while(index<this.source[this.strIndex].length && (symbol.isLetter() || symbol.isNumber() || (symbol == '.' && lexem.count('.') != 1)));
 
         // Проверяем является ли лексема ключевым словом
         for(var i = 0;i<this.keywords.length;i++) {
@@ -86,10 +86,13 @@ Translator.prototype.Lexer = function () {
             }
         }
         // Если лексема не ключевое слово, то идентификатор
-        var item = [lexem, 40, 0, this.strIndex, firstEntry];
-        this.Lexemes.push(item);
-        this.Identifiers.push(item);
-
+        if(lexem.count('.') == 0) {
+            var item = [lexem, 40, 0, this.strIndex, firstEntry];
+            this.Lexemes.push(item);
+            this.Identifiers.push(item);
+        } else {
+            this.Errors.push([lexem,'incorrect characters in the declaration of identifier',this.strIndex,firstEntry]);
+        }
         return index-1;
     }
 
@@ -118,7 +121,6 @@ Translator.prototype.Lexer = function () {
         return index;
     }
 
-
     /*
      * Конструктор Lexer'а
      */
@@ -134,17 +136,13 @@ Translator.prototype.Lexer = function () {
 
             if (symbol != ' ' && symbol != '\r' && symbol != '\t') {
                 if (symbol.isNumber()) {    // Если число
-                    //console.log("Symbol - \'" + symbol + "\' is Number");
                     index = this.parseNumber(index);
                 } else if (symbol.isApostrophe()) {   // Если апостроф(начало строки)
-                    //console.log("Symbol - \'" + symbol + "\' is Apostrophe");
                     index = this.parseStr(index);
                 } else // Если идентфикаторы и символы
                 if (symbol.isLetter() || symbol == "_") {   // Если идентификатор
-                    //console.log("Symbol - \'" + symbol + "\' is Letter");
                     index = this.parseIdnt(index);
                 } else {    // Если не буква
-                    //console.log("Symbol - \'" + symbol + "\' is no Letter");
                     index = this.parseSymbol(index);
                 }
             }
