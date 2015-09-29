@@ -19,10 +19,12 @@ Translator.prototype.Lexer = function () {
             lexem += symbol;
             index++;
             symbol = this.source[this.strIndex][index];
-        } while(index<this.source[this.strIndex].length && symbol.isNumber());
+            console.log(lexem);
+            console.log(lexem.match(/[.]/g));
+        } while(index<this.source[this.strIndex].length && lexem.count('.') < 2 && (symbol.isNumber() || symbol == '.'));
 
         // Добавляем полученную лексему в массивы
-        var item = [lexem, 50, 0, this.strIndex, firstEntry];
+        var item = [lexem, (lexem.count('.'))? 52:50, 0, this.strIndex, firstEntry];
         this.Lexemes.push(item);
         this.Numbers.push(item);
 
@@ -73,9 +75,13 @@ Translator.prototype.Lexer = function () {
         // Проверяем является ли лексема ключевым словом
         for(var i = 0;i<this.keywords.length;i++) {
             if(this.keywords[i][0] == lexem) {
-                var item = [lexem, this.keywords[i][1], 0, this.strIndex, firstEntry];
-                this.Lexemes.push(item);
-
+                if(this.keywords[i][1]>19) {
+                    var item = [lexem, 53, ((this.keywords[i][1]==20)? 1 : 0), this.strIndex, firstEntry];
+                    this.Booleans.push(item);
+                } else {
+                    var item = [lexem, this.keywords[i][1], 0, this.strIndex, firstEntry];
+                    this.Lexemes.push(item);
+                }
                 return index-1;
             }
         }
@@ -125,21 +131,22 @@ Translator.prototype.Lexer = function () {
     for(this.strIndex = 0;this.strIndex<this.source.length;this.strIndex++) {
         for (var index = 0; index < this.source[this.strIndex].length; index++) {
             var symbol = this.source[this.strIndex][index];
-            if (symbol.isNumber()) {    // Если число
-                console.log("Symbol - \'" + symbol + "\' is Number");
-                index = this.parseNumber(index);
-            } else if (symbol.isApostrophe()) {   // Если апостроф(начало строки)
-                console.log("Symbol - \'" + symbol + "\' is Apostrophe");
-                index = this.parseStr(index);
-            } else // Если идентфикаторы и символы
-            if (symbol.isLetter() || symbol == "_") {   // Если буква
-                console.log("Symbol - \'" + symbol + "\' is Letter");
-                index = this.parseIdnt(index);
-            } else if (symbol == ' ' || symbol == '\r' || symbol == '\t') {
-                continue;
-            } else {    // Если не буква
-                console.log("Symbol - \'" + symbol + "\' is no Letter");
-                index = this.parseSymbol(index);
+
+            if (symbol != ' ' && symbol != '\r' && symbol != '\t') {
+                if (symbol.isNumber()) {    // Если число
+                    //console.log("Symbol - \'" + symbol + "\' is Number");
+                    index = this.parseNumber(index);
+                } else if (symbol.isApostrophe()) {   // Если апостроф(начало строки)
+                    //console.log("Symbol - \'" + symbol + "\' is Apostrophe");
+                    index = this.parseStr(index);
+                } else // Если идентфикаторы и символы
+                if (symbol.isLetter() || symbol == "_") {   // Если идентификатор
+                    //console.log("Symbol - \'" + symbol + "\' is Letter");
+                    index = this.parseIdnt(index);
+                } else {    // Если не буква
+                    //console.log("Symbol - \'" + symbol + "\' is no Letter");
+                    index = this.parseSymbol(index);
+                }
             }
         }
     }

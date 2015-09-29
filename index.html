@@ -12,21 +12,43 @@
 <body>
 <h1>Translator Golang to Pascal</h1>
 <div>
-    <table width="40%">
+    <table width="50%">
         <tr>
-            <td>
-                <label for="source">Enter source:*</label>
-                <textarea id="source" maxlength="1000"></textarea>
+            <td valign="top">
+
             </td>
             <td>
-                <label for="source">Output source:</label>
+                <label for="source">Enter source:*</label>
+            </td>
+            <td valign="top">
+
+            </td>
+            <td>
+                <label for="output">Output source:</label>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">
+                <div style="font-family: arial; font-size: 12px;margin-top: 6px;text-align:right;">
+                    <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div>
+                </div>
+            </td>
+            <td>
+                <textarea id="source" maxlength="1000"></textarea>
+            </td>
+            <td valign="top">
+                <div style="font-family: arial; font-size: 12px;margin-top: 6px;text-align:right;">
+                    <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div>
+                </div>
+            </td>
+            <td>
                 <textarea id="output" maxlength="1000"></textarea>
             </td>
         </tr>
     </table>
 </div>
 <button id="startBtn" type="button">Start</button>
-<table width="40%">
+<table width="50%">
     <tr>
         <td>
             <details open>
@@ -37,30 +59,48 @@
     </tr>
     <tr>
         <td valign="top">
-            <details open>
+            <details>
                 <summary>Lexemes Table</summary>
-                <table id="lexemesTable">
+                <table id="lexemesTable" border="1">
                 </table>
             </details>
         </td>
         <td valign="top">
-            <details open>
+            <details>
                 <summary>Identifiers Table</summary>
-                <table id="identifiersTable">
+                <table id="identifiersTable" border="1">
                 </table>
             </details>
         </td>
         <td valign="top">
-            <details open>
+            <details>
                 <summary>Strings Table</summary>
-                <table id="stringsTable">
+                <table id="stringsTable" border="1">
                 </table>
             </details>
         </td>
         <td valign="top">
-            <details open>
+            <details>
                 <summary>Numbers Table</summary>
-                <table id="numbersTable">
+                <table id="numbersTable" border="1">
+                </table>
+            </details>
+        </td>
+        <td valign="top">
+            <details>
+                <summary>Booleans Table</summary>
+                <table id="booleansTable" border="1">
+                </table>
+            </details>
+        </td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td>
+            <details open>
+                <summary>Parse tree</summary>
+                <table id="parseTreeTable" border="1">
                 </table>
             </details>
         </td>
