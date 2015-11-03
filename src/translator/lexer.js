@@ -19,8 +19,6 @@ Translator.prototype.Lexer = function () {
             lexem += symbol;
             index++;
             symbol = this.source[this.strIndex][index];
-            console.log(lexem);
-            console.log(lexem.match(/[.]/g));
         } while(index<this.source[this.strIndex].length && (symbol.isNumber() || (symbol == '.' && lexem.count('.') != 1)));
 
         // Добавляем полученную лексему в массивы
@@ -78,6 +76,7 @@ Translator.prototype.Lexer = function () {
                 if(this.keywords[i][1]>19) {
                     var item = [lexem, 53, ((this.keywords[i][1]==20)? 1 : 0), this.strIndex, firstEntry];
                     this.Booleans.push(item);
+                    this.Lexemes.push(item);
                 } else {
                     var item = [lexem, this.keywords[i][1], 0, this.strIndex, firstEntry];
                     this.Lexemes.push(item);
@@ -110,7 +109,7 @@ Translator.prototype.Lexer = function () {
             } else if(this.symbols[i][0] == symbol+this.source[this.strIndex][index+1]) {
                 var item = [symbol+this.source[this.strIndex][index+1], this.symbols[i][1], this.symbols[i][2], this.strIndex, firstEntry];
                 this.Lexemes.push(item);
-                return index;
+                return index+1;
             }
         }
 

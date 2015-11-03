@@ -31,8 +31,8 @@ function Translator(source) {
         ['string',15],
         ['fmt.Print',16],
         ['fmt.Scan',17],
-        ['fmt.Pow',18],
-        ['fmt.Sqrt',19],
+        ['math.Pow',18],
+        ['math.Sqrt',19],
         ['true',20],
         ['false',21]
     ];
@@ -57,8 +57,8 @@ function Translator(source) {
         ['(',35,0],
         [')',35,1],
         ['=',36,0],
-        [',',37,0],
-        ['&',39,0]
+        [',',37,0]
+        //['&',39,0]
     ];
 
     this.Lexer();   // Лексический анализатор

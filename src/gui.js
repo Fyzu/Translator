@@ -5,7 +5,7 @@
 // Выполняем этот код после загрузки окна
 window.addEventListener("load", function() {
     // Добавляем простой пример языка Go в textarea
-    document.getElementById("source").innerHTML = "func main() {\nvar x,z,c int\nvar y,t string\nx = 10 + 33 * 11\nfmt.Scan(&y)\nfor x!=0 {\nfmt.Print(y)\nx=x-1\n}\nfmt.Print(\"Hello World\")\n}";
+    document.getElementById("source").innerHTML = "func lolka() {\n\tvar o, p int\n\tfmt.Print(o*p)\n}\n\t\nfunc main() {\n\tvar x,z,c int\n\tvar y,t string\n\tvar b bool\n\t{\n\t\tx = 10 + 33 * 11\n\t\tif 44 > 42 {\n\t\t\tx = 10\n\t\t} else {\n\t\t\tt = \"fdfd\"\n\t\t}\n\t\tfor true {\n\t\t\tfor 44 > 1 {\n\t\t\t\tif true {\n\t\t\t\t\tfmt.Scan(y)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tfmt.Scan(y)\n\t\tfor x == 0 {\n\t\t\tfmt.Print(y)\n\t\t\tx=x-1\n\t\t}\n\t\tfmt.Print(\"Hello World\")\n\t}\n}";
 
     // Получаем данные с окна и начинаем трансляцию
     document.getElementById("startBtn").addEventListener("click", function (event) {
