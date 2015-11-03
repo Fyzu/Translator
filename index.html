@@ -1,112 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Translator</title>
-    <link rel="stylesheet" href="src/style/style.css" type="text/css" media="all">
-    <script src="src/translator/translator.js"></script>
-    <script src="src/translator/lexer.js"></script>
-    <script src="src/translator/parser.js"></script>
-    <script src="src/gui.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Translator">
+    <meta name="author" content="Petrov D.V.">
+
+    <title>Translator Golang to Pascal</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="src/css/bootstrap.min.css" rel="stylesheet">
+    <link href="src/css/translator.css" rel="stylesheet">
+    <!-- Translator core -->
+    <script src="src/js/translator/translator.js"></script>
+    <script src="src/js/translator/lexer.js"></script>
+    <script src="src/js/translator/parser.js"></script>
+    <script src="src/js/gui.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 <body>
-<h1>Translator Golang to Pascal</h1>
-<div>
-    <table width="100%">
-        <tr>
-            <td valign="top">
-
-            </td>
-            <td>
-                <label for="source">Enter source:*</label>
-            </td>
-            <td valign="top">
-
-            </td>
-            <td>
-                <label for="output">Output source:</label>
-            </td>
-        </tr>
-        <tr>
-            <td valign="top">
-                <div style="font-family: arial,serif; font-size: 12px;margin-top: 6px;text-align:right;">
-                    <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="">Translator Golang to Pascal</a>
+            <a class="navbar-brand" href="https://vk.com/mr_bens">Petrov D.V.</a>
+        </div>
+    </div>
+</nav>
+<!-- Основной контент -->
+<div class="translator">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="textarea">
+                <h5><label for="source">Golang source:*</label></h5>
+                <div class="textareawrapper">
+                    <textarea id="source" autocomplete="off" class="code_input source" wrap="logical" spellcheck="false" rows="20"></textarea>
                 </div>
-            </td>
-            <td>
-                <textarea id="source" maxlength="1000"></textarea>
-            </td>
-            <td valign="top">
-                <div style="font-family: arial,serif; font-size: 12px;margin-top: 6px;text-align:right;">
-                    <div>0</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="textarea">
+                <h5><label for="output">Pascal source:</label></h5>
+                <div class="textareawrapper">
+                    <textarea id="output" autocomplete="off" class="code_input source" wrap="logical" spellcheck="false" rows="20" readonly ></textarea>
                 </div>
-            </td>
-            <td>
-                <textarea id="output" maxlength="1000"></textarea>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
+    <button id="startBtn" class="btn btn-primary" type="button" style="margin-top:20px; margin-bottom:20px">Translate</button>
+    <details class="table-striped table-bordered">
+        <summary>Output information</summary>
+        <table class="table table-striped table-bordered" cellspacing="0" border="1">
+            <thead>
+            <tr>
+                <th>Errors</th>
+            </tr>
+            </thead>
+            <tbody id="errors">
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-md-9">
+                <table class="table table-striped table-bordered" cellspacing="0" border="1">
+                    <thead>
+                    <tr>
+                        <th>Parse tree</th>
+                    </tr>
+                    </thead>
+                    <tbody id="parseTreeTable">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-3">
+                <table class="table table-striped table-bordered" cellspacing="0" border="1">
+                    <thead>
+                    <tr>
+                        <th>Lexeme</th>
+                        <th>Type</th>
+                        <th>Line</th>
+                    </tr>
+                    </thead>
+                    <tbody id="lexemesTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </details>
 </div>
-<button id="startBtn" type="button">Start</button>
-<table width="100%">
-    <tr>
-        <td>
-            <details open>
-                <summary>Errors</summary>
-                <p id="errors"></p>
-            </details>
-        </td>
-    </tr>
-</table>
-<table width="100%">
-    <tr>
-        <td valign="top">
-            <details>
-                <summary>Lexemes Table</summary>
-                <table id="lexemesTable" border="1">
-                </table>
-            </details>
-        </td>
-        <td valign="top">
-            <details>
-                <summary>Identifiers Table</summary>
-                <table id="identifiersTable" border="1">
-                </table>
-            </details>
-        </td>
-        <td valign="top">
-            <details>
-                <summary>Strings Table</summary>
-                <table id="stringsTable" border="1">
-                </table>
-            </details>
-        </td>
-        <td valign="top">
-            <details>
-                <summary>Numbers Table</summary>
-                <table id="numbersTable" border="1">
-                </table>
-            </details>
-        </td>
-        <td valign="top" width="30%">
-            <details>
-                <summary>Booleans Table</summary>
-                <table id="booleansTable" border="1">
-                </table>
-            </details>
-        </td>
-    </tr>
-</table>
-<table width="100%">
-    <tr>
-        <td>
-            <details open>
-                <summary>Parse tree</summary>
-                <table id="parseTreeTable" border="1">
-                </table>
-            </details>
-        </td>
-    </tr>
-</table>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="src/js/bootstrap.min.js"></script>
+<script>
+    $("textarea").keydown(function(e) {
+        if(e.keyCode === 9) {
+            var start = this.selectionStart;
+            var end = this.selectionEnd;
+
+            var $this = $(this);
+            var value = $this.val();
+            $this.val(value.substring(0, start)
+                    + "    "
+                    + value.substring(end));
+            this.selectionStart = this.selectionEnd = start + 4;
+            e.preventDefault();
+        }
+    });
+</script>
 </body>
 </html>

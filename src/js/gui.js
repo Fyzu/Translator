@@ -5,7 +5,7 @@
 // Выполняем этот код после загрузки окна
 window.addEventListener("load", function() {
     // Добавляем простой пример языка Go в textarea
-    document.getElementById("source").innerHTML = "func testFunc(i int, s string)string{\n\tvar o, p int\n\tfmt.Print(o*p)\n\ts = s + \" \" + \"bar\"\n\treturn s\n}\n\t\nfunc main() {\n\tvar x,z,c int\n\tvar y,t string\n\tvar b bool\n\t{\n\t\tx = 10 + 33 * 11\n\t\tif 44 > 42 {\n\t\t\tx = 10\n\t\t} else {\n\t\t\tt = \"fdfd\"\n\t\t}\n\t\tfor true {\n\t\t\tfor 44 > 1 {\n\t\t\t\tif true {\n\t\t\t\t\tfmt.Scan(&y)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tfmt.Scan(&y)\n\t\tfor x == 0 {\n\t\t\tfmt.Print(y)\n\t\t\tx=x-1\n\t\t}\n\t\tfmt.Print(\"Hello World\")\n\t\tt = testFunc(x, \"foo\")\n\t}\n}";
+    document.getElementById("source").innerHTML = "func testFunc(i int, s string)string{\n    var o, p int\n    fmt.Print(o*p)\n    s = s + \" \" + \"bar\"\n    return s\n}\n    \nfunc main() {\n    var x,z,c int\n    var y,t string\n    var b bool\n    {\n        x = 10 + 33 * 11\n        if 44 > 42 {\n            x = 10\n        } else {\n            t = \"fdfd\"\n        }\n        for true {\n            for 44 > 1 {\n                if true {\n                    fmt.Scan(&y)\n                }\n            }\n        }\n        fmt.Scan(&y)\n        for x == 0 {\n            fmt.Print(y)\n            x=x-1\n        }\n        fmt.Print(\"Hello World\")\n        t = testFunc(x, \"foo\")\n    }\n}";
 
     // Получаем данные с окна и начинаем трансляцию
     document.getElementById("startBtn").addEventListener("click", function (event) {
@@ -21,50 +21,27 @@ window.addEventListener("load", function() {
         var errorsStr = document.getElementById("errors");
         errorsStr.innerHTML = '';
         for(var i = 0; i<translator.Errors.length;i++) {
-            errorsStr.innerHTML += "<p>Error: "+translator.Errors[i][1]+" - line: "+translator.Errors[i][2]+" index: "+translator.Errors[i][3]+"</p>";
+            errorsStr.innerHTML += "<tr><td>Error: "+translator.Errors[i][1]+" - line: "+translator.Errors[i][2]+" index: "+translator.Errors[i][3]+"</td></tr>";
         }
         for(var i = 0; i<translator.SyntaxErrors.length;i++) {
-            errorsStr.innerHTML += "<p>Error: "+translator.SyntaxErrors[i][0]+"</p>";
+            errorsStr.innerHTML += "<tr><td>Error: "+translator.SyntaxErrors[i][0]+"</td></tr>";
         }
         //...Таблица лексем
         var lexemesTable = document.getElementById("lexemesTable");
-        lexemesTable.innerHTML = "<tr><td>Lexeme</td><td>Type</td><td>Line</td></tr>";
+        lexemesTable.innerHTML = "";
         for(var i = 0; i<translator.Lexemes.length;i++) {
             lexemesTable.innerHTML += "<tr><td>"+translator.Lexemes[i][0]+"</td><td>"+translator.Lexemes[i][1]+'.'+translator.Lexemes[i][2]+"</td><td>"+translator.Lexemes[i][3]+"</td></tr>";
-        }
-        //...Таблица идентификаторов
-        var identifiersTable = document.getElementById("identifiersTable");
-        identifiersTable.innerHTML = "<tr><td>Identifier</td><td>Line</td></tr>";
-        for(var i = 0; i<translator.Identifiers.length;i++) {
-            identifiersTable.innerHTML += "<tr><td>"+translator.Identifiers[i][0]+"</td><td>"+translator.Identifiers[i][3]+"</td></tr>";
-        }
-        //...Таблица строк
-        var stringsTable = document.getElementById("stringsTable");
-        stringsTable.innerHTML = "<tr><td>String</td><td>Line</td></tr>";
-        for(var i = 0; i<translator.Strings.length;i++) {
-            stringsTable.innerHTML += "<tr><td>"+translator.Strings[i][0]+"</td><td>"+translator.Strings[i][3]+"</td></tr>";
-        }
-        //..Таблица чисел
-        var numbersTable = document.getElementById("numbersTable");
-        numbersTable.innerHTML = "<tr><td>Number</td><td>Line</td></tr>";
-        for(var i = 0; i<translator.Numbers.length;i++) {
-            numbersTable.innerHTML += "<tr><td>"+translator.Numbers[i][0]+"</td><td>"+translator.Numbers[i][3]+"</td></tr>";
-        }
-        //..Таблица логических
-        var booleansTable = document.getElementById("booleansTable");
-        booleansTable.innerHTML = "<tr><td>Boolean</td><td>Line</td></tr>";
-        for(var i = 0; i<translator.Booleans.length;i++) {
-            booleansTable.innerHTML += "<tr><td>"+translator.Booleans[i][0]+"</td><td>"+translator.Booleans[i][3]+"</td></tr>";
         }
         //..Таблица синтаксических правил
         var parseTreeTable = document.getElementById("parseTreeTable");
         parseTreeTable.innerHTML = "";
+        var str = "";
         for(var i = 0; i<translator.Rules.length;i++) {
-            parseTreeTable.innerHTML += "<tr><td>";
+            str = "";
             for(var j = 0;j<translator.Rules[i].length;j++) {
-                parseTreeTable.innerHTML += translator.Rules[i][j] + ' ';
+                str += translator.Rules[i][j] + ' ';
             }
-            parseTreeTable.innerHTML += "</td></tr>";
+            parseTreeTable.innerHTML += "<tr><td>" + str + "</td></tr>";
         }
     });
 });
