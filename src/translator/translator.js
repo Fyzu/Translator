@@ -11,7 +11,7 @@ function Translator(source) {
     this.Identifiers = [];      // Массив идентификаторов
     this.Strings = [];          // Массив строк
     this.Numbers = [];          // Массив чисел
-    this.Booleans = [];
+    this.Booleans = [];         // Массив логических выражений
     this.Errors = [];           // Массив ошибок
     this.keywords = [           // Таблица ключевых слов
         ['func',1],
@@ -57,12 +57,10 @@ function Translator(source) {
         ['(',35,0],
         [')',35,1],
         ['=',36,0],
-        [',',37,0]
-        //['&',39,0]
+        [',',37,0],
+        ['&',38,0]
     ];
 
     this.Lexer();   // Лексический анализатор
-    this.Parser();  // Синтаксический анализатор - WIP
-    // Генератор кода - WIP
-
+    this.Parser();  // Синтаксический анализатор
 }
