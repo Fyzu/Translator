@@ -34,7 +34,9 @@ Translator.prototype.Parser = function () {
     /*
      * Методы Parser'а
      */
-    // Проверка граматики < программа >
+    /** Проверка граматики < программа >
+     * @return {boolean}
+     */
     this.Program = function () {
         if(this.Lexemes.length == 0) {
             this.Rules.push('empty');
@@ -43,15 +45,16 @@ Translator.prototype.Parser = function () {
 
         this.Rules.push(['<программа>','=>','<блок функций>','<тело главной программы>']);
         currentRule = 0;
-        if(!this.functionBlock()) {
-            this.Rules[currentRule].splice(2,1);
+        var programRuleIndex = currentRule;
+        if(this.functionBlock()) {
+            this.Rules[programRuleIndex].push('<блок функций>');
         }
         if(this.mainProgram()) {
+            this.Rules[programRuleIndex].push('<тело главной программы>');
             return true;
         }
-
         return false;
-    }
+    };
 
     // Проверка граматики < тело главной программы >
     this.mainProgram = function () {
@@ -60,6 +63,7 @@ Translator.prototype.Parser = function () {
            this.Lexemes[currentLexeme+4][0] == '{')
         {
             isFunc = false;
+            Declare.clear();
             currentLexeme += 5;     // Пропускаем 5 обработанных лексем
             this.Rules.push(['<тело главной программы>','=>','func main(){','<блок переменных>','<последовательность операторов>','}']);
             currentRule++;
@@ -81,7 +85,7 @@ Translator.prototype.Parser = function () {
             this.SyntaxErrors.push(['main function not found']);
         }
         return false;
-    }
+    };
 
     // Проверка граматики < блок переменных >
     this.variablesBlock = function () {
@@ -97,7 +101,7 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < объявление переменных >
     this.variables = function () {
@@ -113,7 +117,7 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < список имен >
     this.nameList = function () {
@@ -146,7 +150,7 @@ Translator.prototype.Parser = function () {
         }
         this.Source += (' :');   // Pascal
         return true;
-    }
+    };
 
     // Проверка граматики < тип >
     this.variableType = function () {
@@ -157,7 +161,7 @@ Translator.prototype.Parser = function () {
             if(this.Lexemes[currentLexeme+1][1] == 50 && this.Lexemes[currentLexeme+2][0] == ']') {
                 this.Rules[currentRule].push('array');
                 this.Rules[currentRule].push(this.Lexemes[currentLexeme + 1][0]);
-                this.Source += (' [' + this.Lexemes[currentLexeme + 1][0] + ']') // Pascal
+                this.Source += (' [' + this.Lexemes[currentLexeme + 1][0] + ']'); // Pascal
                 currentLexeme += 3;
             } else {
                this.SyntaxErrors.push(['incorrect array size']);
@@ -165,7 +169,7 @@ Translator.prototype.Parser = function () {
         }
         identifierInFunctions = identifierInFunctions.concat(Variables);
         if (this.Lexemes[currentLexeme][1] === 12) {
-            this.Source += (' boolean') // Pascal
+            this.Source += (' boolean'); // Pascal
             if(isFunc)
                 fTypeB = fTypeB.concat(Variables);
             else
@@ -174,7 +178,7 @@ Translator.prototype.Parser = function () {
             this.Rules[currentRule].push(this.Lexemes[currentLexeme++][0]);
             return true;
         } else if (this.Lexemes[currentLexeme][1] === 13) {
-            this.Source += (' integer') // Pascal
+            this.Source += (' integer'); // Pascal
             if(isFunc)
                 fTypeI = fTypeI.concat(Variables);
             else
@@ -183,7 +187,7 @@ Translator.prototype.Parser = function () {
             this.Rules[currentRule].push(this.Lexemes[currentLexeme++][0]);
             return true;
         } else if (this.Lexemes[currentLexeme][1] === 14) {
-            this.Source += (' real') // Pascal
+            this.Source += (' real'); // Pascal
             if(isFunc)
                 fTypeF = fTypeF.concat(Variables);
             else
@@ -192,7 +196,7 @@ Translator.prototype.Parser = function () {
             this.Rules[currentRule].push(this.Lexemes[currentLexeme++][0]);
             return true;
         } else if (this.Lexemes[currentLexeme][1] === 15) {
-            this.Source += (' string') // Pascal
+            this.Source += (' string'); // Pascal
             if(isFunc)
                 fTypeS = fTypeS.concat(Variables);
             else
@@ -204,7 +208,7 @@ Translator.prototype.Parser = function () {
             this.SyntaxErrors.push(['incorrectly declared variable type']);
         }
         return false;
-    }
+    };
 
     // Проверка граматики < последовательность операторов >
     this.operatorSequence = function () {
@@ -213,7 +217,7 @@ Translator.prototype.Parser = function () {
         var operatorSequenceRuleIndex = currentRule;
 
         if(this.operator()) {
-            this.Source += (';\n') // Pascal
+            this.Source += (';\n'); // Pascal
             if(!this.operatorSequence()) {
                 this.Rules[operatorSequenceRuleIndex].splice(3,1);
             }
@@ -223,29 +227,29 @@ Translator.prototype.Parser = function () {
             currentRule--;
         }
         return false;
-    }
+    };
 
     // Проверка граматики <вызов функции>
     this.callFunc = function () {
         this.Rules.push(['<вызов функции>', '=>', 'ид.']);
         currentRule++;
         var operatorRuleIndex = currentRule;
-        this.Source += (this.Lexemes[currentLexeme++][0]) // Pascal
+        this.Source += (this.Lexemes[currentLexeme++][0]); // Pascal
         if(this.Lexemes[currentLexeme][0] == '(') {
             this.Rules[operatorRuleIndex].push('(');
-            this.Source += ('(') // Pascal
+            this.Source += ('('); // Pascal
             currentLexeme++;
             if(this.Lexemes[currentLexeme][0] != ')') {
                 currentLexeme--;
                 do {
                     if (this.Lexemes[currentLexeme][0] == ',') {
                         this.Rules[operatorRuleIndex].push(',');
-                        this.Source += (', ') // Pascal
+                        this.Source += (', '); // Pascal
                     }
                     currentLexeme++;
                     var type;
                     if (this.Lexemes[currentLexeme][1] == 40)
-                        type = variableType(this.Lexemes[currentLexeme][0], isFunc);
+                        type = variableType(this.Lexemes[currentLexeme][0]);
                     else
                         type = this.Lexemes[currentLexeme][1];
                     if (!this.expression(type)) {
@@ -256,12 +260,12 @@ Translator.prototype.Parser = function () {
             if(this.Lexemes[currentLexeme][0] == ')') {
                 currentLexeme++;
                 this.Rules[operatorRuleIndex].push(')');
-                this.Source += (')') // Pascal
+                this.Source += (')'); // Pascal
                 return true;
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < оператор >
     this.operator = function () {
@@ -283,22 +287,14 @@ Translator.prototype.Parser = function () {
         else if(this.Lexemes[currentLexeme][1] == 40) {
             this.Rules.push(['<оператор>', '=>', 'ид.', '=', '<выражение>']);
             currentRule++;
+            var operatorRuleIndex = currentRule;
             var identifier = this.Lexemes[currentLexeme][0];
-            var type = variableType(this.Lexemes[currentLexeme++][0], isFunc);
-            if(this.Lexemes[currentLexeme][0] == '[') {
-                if(this.Lexemes[currentLexeme+1][1] == 50 && this.Lexemes[currentLexeme+2][0] == ']') {
-                    currentLexeme+=3;
-                    identifier += '[' + this.Lexemes[currentLexeme+1][0] + ']';
-                    currentRule++;
-                } else {
-                    this.SyntaxErrors.push(['not closed reference to an array element']);
-                    return false;
-                }
-            }
-            this.Source += (identifier) // Pascal
+            var type = variableType(this.Lexemes[currentLexeme++][0]);
+            this.Source += (identifier); // Pascal
             identifierInOperators.push(identifier);
+            this.appealArray(operatorRuleIndex);
             if (this.Lexemes[currentLexeme][1] == 36) {
-                this.Source += (' := ') // Pascal
+                this.Source += (' := '); // Pascal
                 currentLexeme++;
                 if (this.expression(type)) {
                     return true;
@@ -313,22 +309,22 @@ Translator.prototype.Parser = function () {
             currentRule++;
             currentLexeme++;
             var operatorRuleIndex = currentRule;
-            this.Source += ('if ') // Pascal
+            this.Source += ('if '); // Pascal
             if(this.condition()) {
                 this.Rules[operatorRuleIndex].push('<условие>');
                 if(this.Lexemes[currentLexeme][0] == '{') {
-                    this.Source += (' then\nbegin\n') // Pascal
+                    this.Source += (' then\nbegin\n'); // Pascal
                     this.Rules[operatorRuleIndex].push('{');
                     currentLexeme++;
                     if(this.operatorSequence()) {
                         this.Rules[operatorRuleIndex].push('<последовательность операторов>');
                         if(this.Lexemes[currentLexeme][0] == '}') {
                             this.Rules[operatorRuleIndex].push('}');
-                            this.Source += ('end') // Pascal
+                            this.Source += ('end'); // Pascal
                             currentLexeme++;
                         }
                         if (this.Lexemes[currentLexeme][1] == 5) {
-                            this.Source += (';\nelse\nbegin\n') // Pascal
+                            this.Source += (';\nelse\nbegin\n'); // Pascal
                             this.Rules[operatorRuleIndex].push('else');
                             currentLexeme++;
                             if(this.Lexemes[currentLexeme][0] == '{') {
@@ -339,7 +335,7 @@ Translator.prototype.Parser = function () {
                                     if (this.Lexemes[currentLexeme][0] == '}') {
                                         this.Rules[operatorRuleIndex].push('}');
                                         currentLexeme++;
-                                        this.Source += ('end') // Pascal
+                                        this.Source += ('end'); // Pascal
                                         return true;
                                     }
                                 }
@@ -357,21 +353,21 @@ Translator.prototype.Parser = function () {
          ****************************************************/
         else if (this.Lexemes[currentLexeme][1] == 6) {
             this.Rules.push(['<оператор>', '=>', 'for']);
-            this.Source += ('while ') // Pascal
+            this.Source += ('while '); // Pascal
             currentRule++;
             currentLexeme++;
             var operatorRuleIndex = currentRule;
             if(this.condition()) {
                 this.Rules[operatorRuleIndex].push('<условие>');
                 if(this.Lexemes[currentLexeme][0] == '{') {
-                    this.Source += (' do\nbegin\n') // Pascal
+                    this.Source += (' do\nbegin\n'); // Pascal
                     this.Rules[operatorRuleIndex].push('{');
                     currentLexeme++;
                     if(this.operatorSequence()) {
                         this.Rules[operatorRuleIndex].push('<последовательность операторов>');
                         if(this.Lexemes[currentLexeme][0] == '}') {
                             this.Rules[operatorRuleIndex].push('}');
-                            this.Source += ('end') // Pascal
+                            this.Source += ('end'); // Pascal
                             currentLexeme++;
                             return true;
                         }
@@ -386,25 +382,31 @@ Translator.prototype.Parser = function () {
             this.Rules.push(['<оператор>', '=>', this.Lexemes[currentLexeme][0]]);
             currentRule++;
             currentLexeme++;
-            this.Source += ('writeln') // Pascal
+            this.Source += ('writeln'); // Pascal
             var operatorRuleIndex = currentRule;
             if(this.Lexemes[currentLexeme][0] == '(') {
                 this.Rules[operatorRuleIndex].push('(');
-                this.Source += ('(') // Pascal
+                this.Source += ('('); // Pascal
                 currentLexeme++;
-                var type;
-                if(this.Lexemes[currentLexeme][1] == 40)
-                    type = variableType(this.Lexemes[currentLexeme][0], isFunc);
-                else
-                    type = this.Lexemes[currentLexeme][1];
-                if(this.expression(type)) {
-                    this.Rules[operatorRuleIndex].push('<выражение>');
-                    if(this.Lexemes[currentLexeme][0] == ')') {
-                        this.Source += (')') // Pascal
-                        this.Rules[operatorRuleIndex].push(')');
-                        currentLexeme++;
-                        return true;
+                if(this.Lexemes[currentLexeme][1] == 40 && namesFunction.itemExists(this.Lexemes[currentLexeme][0])) {
+                    if (this.callFunc()) {
+                        this.Rules[operatorRuleIndex].push('<вызов функции>');
                     }
+                } else {
+                    var type;
+                    if(this.Lexemes[currentLexeme][1] == 40)
+                        type = variableType(this.Lexemes[currentLexeme][0]);
+                    else
+                        type = this.Lexemes[currentLexeme][1];
+                    if (this.expression(type)) {
+                        this.Rules[operatorRuleIndex].push('<выражение>');
+                    }
+                }
+                if (this.Lexemes[currentLexeme][0] == ')') {
+                    this.Source += (')'); // Pascal
+                    this.Rules[operatorRuleIndex].push(')');
+                    currentLexeme++;
+                    return true;
                 }
             }
         }
@@ -415,26 +417,29 @@ Translator.prototype.Parser = function () {
             this.Rules.push(['<оператор>', '=>', this.Lexemes[currentLexeme][0]]);
             currentRule++;
             currentLexeme++;
-            this.Source += ('readln') // Pascal
+            this.Source += ('readln'); // Pascal
             var operatorRuleIndex = currentRule;
             if(this.Lexemes[currentLexeme][0] == '(') {
                 this.Rules[operatorRuleIndex].push('(');
-                this.Source += ('(') // Pascal
+                this.Source += ('('); // Pascal
                 currentLexeme++;
                 if(this.Lexemes[currentLexeme][1] == 38) {
                     this.Rules[operatorRuleIndex].push('&');
                     currentLexeme++;
                     if (this.Lexemes[currentLexeme][1] == 40) {
-                        this.Source += (this.Lexemes[currentLexeme][0]) // Pascal
+                        this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
                         this.Rules[operatorRuleIndex].push('ид.');
                         identifierInOperators.push(this.Lexemes[currentLexeme++][0]);
+                        this.appealArray(operatorRuleIndex);
                         if (this.Lexemes[currentLexeme][0] == ')') {
-                            this.Source += (')') // Pascal
+                            this.Source += (')'); // Pascal
                             this.Rules[operatorRuleIndex].push(')');
                             currentLexeme++;
                             return true;
                         }
                     }
+                } else {
+                    this.SyntaxErrors.push(['incorrect type in function fmt.Scan']);
                 }
             }
         }
@@ -446,11 +451,11 @@ Translator.prototype.Parser = function () {
             currentRule++;
             currentLexeme++;
             var operatorRuleIndex = currentRule;
-            this.Source += ('begin\n') // Pascal
+            this.Source += ('begin\n'); // Pascal
             if(this.operatorSequence()) {
                 this.Rules[operatorRuleIndex].push('<последовательность операторов>');
                 if(this.Lexemes[currentLexeme][0] == '}') {
-                    this.Source += ('end') // Pascal
+                    this.Source += ('end'); // Pascal
                     this.Rules[operatorRuleIndex].push('}');
                     currentLexeme++;
                     return true;
@@ -458,10 +463,10 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Определение типа по названию идентификатора
-    var variableType = function (identifier, isFunc) {
+    var variableType = function (identifier) {
         if(isFunc) {
             if(fTypeB.itemExists(identifier)) {
                 return 12;  // Если bool
@@ -487,7 +492,7 @@ Translator.prototype.Parser = function () {
                 return 0;
             }
         }
-    }
+    };
 
     // Проверка граматики < выражение >
     this.expression = function (type) {
@@ -507,11 +512,11 @@ Translator.prototype.Parser = function () {
             this.SyntaxErrors.push(['incorrect type of expression']);
             return false;
         }
-    }
+    };
 
     // Проверка граматики < численное выражение >
     this.numExpression = function () {
-        this.Rules.push(['<численное выражение>','=>',]);
+        this.Rules.push(['<численное выражение>','=>']);
         currentRule++;
         var numExpressionRuleIndex = currentRule;
         if(this.Lexemes[currentLexeme][1] == 40 || this.Lexemes[currentLexeme][1] == 50 || this.Lexemes[currentLexeme][1] == 52 // идентификатор или целая константа
@@ -528,7 +533,7 @@ Translator.prototype.Parser = function () {
                 }
             }
         } else if (this.Lexemes[currentLexeme][1] == 18) {
-            this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
+            this.Source += ('Pow'); // Pascal
             this.Rules[numExpressionRuleIndex].push(this.Lexemes[currentLexeme++][0]);
             if(this.Lexemes[currentLexeme][0] == '(') {
                 this.Source += ('('); // Pascal
@@ -543,8 +548,9 @@ Translator.prototype.Parser = function () {
                     if (!this.numExpression()) {
                         this.SyntaxErrors.push(['no expression after the arithmetic operators']);
                     }
-                    if(this.Lexemes[currentLexeme++][0] != ')') {
-                        this.SyntaxErrors.push(['not a closed bracket']);
+                    if(this.Lexemes[currentLexeme][0] != ')') {
+                        this.SyntaxErrors(['no a close bracket after function math.Pow']);
+                        return false;
                     }
                     this.Source += (')'); // Pascal
                 } else {
@@ -552,7 +558,7 @@ Translator.prototype.Parser = function () {
                 }
             }
         } else if (this.Lexemes[currentLexeme][1] == 19) {
-            this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
+            this.Source += ('Sqrt'); // Pascal
             this.Rules[numExpressionRuleIndex].push(this.Lexemes[currentLexeme++][0]);
             if(this.Lexemes[currentLexeme][0] == '(') {
                 this.Source += ('('); // Pascal
@@ -561,6 +567,10 @@ Translator.prototype.Parser = function () {
                 if(!this.numExpression()) {
                     this.SyntaxErrors.push(['no expression after the arithmetic operators']);
                 }
+                if(this.Lexemes[currentLexeme++][0] != ')') {
+                    this.SyntaxErrors(['no a close bracket after function math.Sqrt']);
+                    return false;
+                }
                 this.Source += (')'); // Pascal
             } else {
                 this.SyntaxErrors(['no a open bracket after function math.Sqrt']);
@@ -568,14 +578,14 @@ Translator.prototype.Parser = function () {
         }
 
         return true;
-    }
+    };
 
     // Проверка на < терм >
     this.term = function () {
         if(this.Lexemes[currentLexeme][1] == 40 || this.Lexemes[currentLexeme][1] == 50 || this.Lexemes[currentLexeme][1] == 52 // идентификатор или целая константа
             || this.Lexemes[currentLexeme][0] == '(')
         {
-            this.Rules.push(['<терм>','=>',]);
+            this.Rules.push(['<терм>','=>']);
             currentRule++;
             var termRuleIndex = currentRule;
             if(this.Lexemes[currentLexeme][1] == 40 || this.Lexemes[currentLexeme][1] == 50 || this.Lexemes[currentLexeme][1] == 52) {
@@ -587,6 +597,7 @@ Translator.prototype.Parser = function () {
                 } else {
                     this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
                     this.Rules[currentRule].push(this.Lexemes[currentLexeme++][0]);
+                    this.appealArray(termRuleIndex);
                 }
             } else if(this.Lexemes[currentLexeme][0] == '(') {
                 this.Source += ('('); // Pascal
@@ -605,12 +616,11 @@ Translator.prototype.Parser = function () {
             return true;
         }
         return false;
-    }
-
+    };
 
     // Проверка граматики < логическое выражение >
     this.boolExpression = function () {
-        this.Rules.push(['<логическое выражение>','=>',]);
+        this.Rules.push(['<логическое выражение>','=>']);
         currentRule++;
         var boolExpressionRuleIndex = currentRule;
         if(this.condition()) {
@@ -618,17 +628,17 @@ Translator.prototype.Parser = function () {
             return true;
         }
         return false;
-    }
+    };
 
     // Проверка граматики < условие >
     this.condition = function () {
-        this.Rules.push(['<условие>','=>',]);
+        this.Rules.push(['<условие>','=>']);
         currentRule++;
         var conditionRuleIndex = currentRule;
         if (this.Lexemes[currentLexeme][1] == 33 && this.Lexemes[currentLexeme][2] == 0) {
             currentLexeme++;
             this.Rules[conditionRuleIndex].push('!');
-            this.Source += ('not ') // Pascal
+            this.Source += ('not '); // Pascal
             if(this.condition()){
                 this.Rules[conditionRuleIndex].push('<условие>');
                 return true;
@@ -637,10 +647,16 @@ Translator.prototype.Parser = function () {
             }
         } else if (this.Lexemes[currentLexeme][1] == 40  || this.Lexemes[currentLexeme][1] == 50  || this.Lexemes[currentLexeme][1] == 51
                 || this.Lexemes[currentLexeme][1] == 52 || this.Lexemes[currentLexeme][1] == 53 || this.Lexemes[currentLexeme][1] == 18  || this.Lexemes[currentLexeme][1] == 19) {
-            if(this.Lexemes[currentLexeme][1] == 53 || this.Lexemes[currentLexeme][1] == 18  || this.Lexemes[currentLexeme][1] == 19) {
-                this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
+            if(this.Lexemes[currentLexeme][1] == 53) {
+                if(this.Lexemes[currentLexeme][0] == 'true')
+                    this.Source += ('True'); // Pascal
+                else
+                    this.Source += ('False'); // Pascal
                 this.Rules[conditionRuleIndex].push(this.Lexemes[currentLexeme++][0]);
-            } else {
+            } else if(variableType(this.Lexemes[currentLexeme][0]) == 12) {
+                this.Source += (this.Lexemes[currentLexeme++][0]); // Pascal
+                this.Rules[conditionRuleIndex].push("ид.");
+            }else {
                 this.Rules[conditionRuleIndex].push('<сравнение>');
                 if (!this.comparison()) {
                     return false
@@ -648,7 +664,13 @@ Translator.prototype.Parser = function () {
             }
             if(this.Lexemes[currentLexeme][1] == 33) {
                 this.Rules[conditionRuleIndex].push(this.Lexemes[currentLexeme][0]);
-                this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
+                if(this.Lexemes[currentLexeme][2] == 0) {
+                    this.Source += ('not '); // Pascal
+                } else if(this.Lexemes[currentLexeme][2] == 1) {
+                    this.Source += (' and '); // Pascal
+                } else if(this.Lexemes[currentLexeme][2] == 2) {
+                    this.Source += (' or '); // Pascal
+                }
                 currentLexeme++;
                 if(this.condition()) {
                     this.Rules[conditionRuleIndex].push('<условие>');
@@ -659,7 +681,7 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < сравнение >
     this.comparison = function () {
@@ -667,19 +689,21 @@ Translator.prototype.Parser = function () {
         currentRule++;
         var comparisonRuleIndex = currentRule;
         var type;
-        if(this.Lexemes[currentLexeme][1] == 40)
-            type = variableType(this.Lexemes[currentLexeme][0], isFunc);
-        else
+        if(this.Lexemes[currentLexeme][1] == 40) {
+            type = variableType(this.Lexemes[currentLexeme][0]);
+        } else
             type = this.Lexemes[currentLexeme][1];
+        console.log(type);
         if(this.expression(type)) {
+            console.log(this.Lexemes[currentLexeme][0]);
             if (this.Lexemes[currentLexeme][1] == 31) {
-                this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
+                if(this.Lexemes[currentLexeme][2] == 5) {
+                    this.Source += (' <> '); // Pascal
+                } else {
+                    this.Source += (' ' + this.Lexemes[currentLexeme][0] + ' '); // Pascal
+                }
                 this.Rules[comparisonRuleIndex].push(this.Lexemes[currentLexeme][0]);
                 currentLexeme++;
-                if(this.Lexemes[currentLexeme][1] == 40)
-                    type = variableType(this.Lexemes[currentLexeme][0], isFunc);
-                else
-                    type = this.Lexemes[currentLexeme][1];
                 if(this.expression(type)) {
                     this.Rules[comparisonRuleIndex].push('<выражение>');
                     return true;
@@ -687,11 +711,11 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < строковое выражение >
     this.stringExpression = function () {
-        this.Rules.push(['<строковое выражение>','=>',]);
+        this.Rules.push(['<строковое выражение>','=>']);
         currentRule++;
         var stringexpressionRuleIndex = currentRule;
         if(this.stringTerm()) {
@@ -709,11 +733,11 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < стр. терм >
     this.stringTerm = function () {
-        this.Rules.push(['<стр. терм>','=>',]);
+        this.Rules.push(['<стр. терм>','=>']);
         currentRule++;
         var stringTermRuleIndex = currentRule;
         if(this.Lexemes[currentLexeme][1] == 40) {
@@ -727,6 +751,7 @@ Translator.prototype.Parser = function () {
                 identifierInOperators.push(this.Lexemes[currentLexeme][0]);
                 this.Rules[stringTermRuleIndex].push('ид.');
                 currentLexeme++;
+                this.appealArray(stringTermRuleIndex);
                 return true;
             }
         } else if (this.Lexemes[currentLexeme][1] == 51) {
@@ -736,23 +761,45 @@ Translator.prototype.Parser = function () {
             return true;
         }
         return false;
+    };
+
+    // Проверка граматики [ < численное выражение > ]
+    this.appealArray = function (currentRule) {
+        if(this.Lexemes[currentLexeme][0] == '[') {
+            this.Source += (this.Lexemes[currentLexeme++][0]); // Pascal
+            this.Rules[currentRule].push('[');
+            if(this.numExpression()) {
+                this.Rules[currentRule].push('<численное выражение>');
+                if(this.Lexemes[currentLexeme][0] == ']') {
+                    this.Source += (this.Lexemes[currentLexeme][0]); // Pascal
+                    this.Rules[currentRule].push(this.Lexemes[currentLexeme++][0]);
+                    return true;
+                } else {
+                    this.SyntaxErrors.push(['not closed reference to an array element']);
+                }
+            } else {
+                this.SyntaxErrors.push(['WIP']);
+            }
+        }
+        return false;
     }
 
     // Проверка граматики < блок функций >
     this.functionBlock = function () {
         if(this.Lexemes[currentLexeme][0] == 'func' && this.Lexemes[currentLexeme+1][0] != 'main') { // Если текущая лекссема - func и след. не main
-            this.Rules.push(['<блок функций>','=>','<функция>','<другой блок функций>']);
+            this.Rules.push(['<блок функций>','=>','<функция>']);
             currentRule++;
             var functionBlockRuleIndex = currentRule;
             if(this.function()) {
-                if(!this.functionBlock) {
-                    this.Rules[functionBlockRuleIndex].splice(3,1);
+                this.Rules[functionBlockRuleIndex].push('<функция>');
+                if(this.functionBlock()) {
+                    this.Rules[functionBlockRuleIndex].push('<другой блок функций>');
                 }
                 return true;
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < функция >
     this.function = function () {
@@ -795,29 +842,29 @@ Translator.prototype.Parser = function () {
                             currentLexeme++;
                             if(this.variablesBlock()) {
                                 this.Rules[functionRuleIndex].push('<блок переменных>');
-                                this.Source += ('begin\n');   // Pascal
-                                if(this.operatorSequence()) {
-                                    this.Rules[functionRuleIndex].push('<последовательность операторов>');
-                                    if(this.Lexemes[currentLexeme][1] == 3) {
-                                        this.Source += (namesFunction[namesFunction.length-1] + ' := '); // Pascal
-                                        this.Rules[functionRuleIndex].push('return');
-                                        currentLexeme++;
-                                        var type;
-                                        if(this.Lexemes[currentLexeme][1] == 40)
-                                            type = variableType(this.Lexemes[currentLexeme][0], isFunc);
-                                        else
-                                            type = this.Lexemes[currentLexeme][1];
-                                        if (this.expression(type)) {
-                                            this.Source += (';\n'); // Pascal
-                                            this.Rules[functionRuleIndex].push('<выражение>');
-                                        }
+                            }
+                            this.Source += ('begin\n');   // Pascal
+                            if(this.operatorSequence()) {
+                                this.Rules[functionRuleIndex].push('<последовательность операторов>');
+                                if(this.Lexemes[currentLexeme][1] == 3) {
+                                    this.Source += (namesFunction[namesFunction.length-1] + ' := '); // Pascal
+                                    this.Rules[functionRuleIndex].push('return');
+                                    currentLexeme++;
+                                    var type;
+                                    if(this.Lexemes[currentLexeme][1] == 40)
+                                        type = variableType(this.Lexemes[currentLexeme][0]);
+                                    else
+                                        type = this.Lexemes[currentLexeme][1];
+                                    if (this.expression(type)) {
+                                        this.Source += (';\n'); // Pascal
+                                        this.Rules[functionRuleIndex].push('<выражение>');
                                     }
-                                    if(this.Lexemes[currentLexeme][0] == '}') {
-                                        this.Source += ('end;\n\n');   // Pascal
-                                        this.Rules[functionRuleIndex].push('}');
-                                        currentLexeme++;
-                                        return true;
-                                    }
+                                }
+                                if(this.Lexemes[currentLexeme][0] == '}') {
+                                    this.Source += ('end;\n\n');   // Pascal
+                                    this.Rules[functionRuleIndex].push('}');
+                                    currentLexeme++;
+                                    return true;
                                 }
                             }
                         }
@@ -826,7 +873,7 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < входные параметры >
     this.inputParam = function () {
@@ -839,14 +886,26 @@ Translator.prototype.Parser = function () {
             var param = this.Lexemes[currentLexeme][0];
             paramsInFunctions.push(param);
             currentLexeme++;
-            if(this.Lexemes[currentLexeme][1] == 12) {
-                fTypeB.push(param);
-            } else if(this.Lexemes[currentLexeme][1] == 13) {
-                fTypeI.push(param);
-            } else if(this.Lexemes[currentLexeme][1] == 14) {
-                fTypeF.push(param);
-            } else if(this.Lexemes[currentLexeme][1] == 15) {
-                fTypeS.push(param);
+            if(this.Lexemes[currentLexeme][0] == '[') {
+                if(this.Lexemes[currentLexeme+3][1] == 12) {
+                    fTypeB.push(param);
+                } else if(this.Lexemes[currentLexeme+3][1] == 13) {
+                    fTypeI.push(param);
+                } else if(this.Lexemes[currentLexeme+3][1] == 14) {
+                    fTypeF.push(param);
+                } else if(this.Lexemes[currentLexeme+3][1] == 15) {
+                    fTypeS.push(param);
+                }
+            } else {
+                if (this.Lexemes[currentLexeme][1] == 12) {
+                    fTypeB.push(param);
+                } else if (this.Lexemes[currentLexeme][1] == 13) {
+                    fTypeI.push(param);
+                } else if (this.Lexemes[currentLexeme][1] == 14) {
+                    fTypeF.push(param);
+                } else if (this.Lexemes[currentLexeme][1] == 15) {
+                    fTypeS.push(param);
+                }
             }
             if(this.variableType()) {
                 this.Rules[inputParamRuleIndex].push('<тип>');
@@ -863,7 +922,7 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     /*
      * Конструктор Лексического анализатора
@@ -892,4 +951,12 @@ Translator.prototype.Parser = function () {
     console.log(paramsInFunctions);
     console.log('identifier In Functions');
     console.log(identifierInFunctions);
-}
+    console.log('Functions Type Boolean');
+    console.log(fTypeB);
+    console.log('Functions Type Int');
+    console.log(fTypeI);
+    console.log('Functions Type Float');
+    console.log(fTypeF);
+    console.log('Functions Type String');
+    console.log(fTypeS);
+};

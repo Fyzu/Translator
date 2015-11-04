@@ -27,7 +27,7 @@ Translator.prototype.Lexer = function () {
         this.Numbers.push(item);
 
         return index-1;
-    }
+    };
 
     // Разбор строковой константы
     this.parseStr = function(index) {
@@ -55,7 +55,7 @@ Translator.prototype.Lexer = function () {
         }
 
         return index;
-    }
+    };
 
     // Разбор идентификаторов
     this.parseIdnt = function(index) {
@@ -93,7 +93,7 @@ Translator.prototype.Lexer = function () {
             this.Errors.push([lexem,'incorrect characters in the declaration of identifier',this.strIndex,firstEntry]);
         }
         return index-1;
-    }
+    };
 
     // Разбор символа
     this.parseSymbol = function(index) {
@@ -102,14 +102,14 @@ Translator.prototype.Lexer = function () {
 
         // Проверяем, корректный ли символ
         for(var i = 0;i<this.symbols.length;i++) {
-            if(this.symbols[i][0] == symbol) {
-                var item = [symbol, this.symbols[i][1], this.symbols[i][2], this.strIndex, firstEntry];
-                this.Lexemes.push(item);
-                return index;
-            } else if(this.symbols[i][0] == symbol+this.source[this.strIndex][index+1]) {
+            if(this.symbols[i][0] == symbol+this.source[this.strIndex][index+1]) {
                 var item = [symbol+this.source[this.strIndex][index+1], this.symbols[i][1], this.symbols[i][2], this.strIndex, firstEntry];
                 this.Lexemes.push(item);
                 return index+1;
+            } else if(this.symbols[i][0] == symbol) {
+                var item = [symbol, this.symbols[i][1], this.symbols[i][2], this.strIndex, firstEntry];
+                this.Lexemes.push(item);
+                return index;
             }
         }
 
@@ -118,7 +118,7 @@ Translator.prototype.Lexer = function () {
         this.Errors.push(item);
 
         return index;
-    }
+    };
 
     /*
      * Конструктор Lexer'а
@@ -147,4 +147,4 @@ Translator.prototype.Lexer = function () {
             }
         }
     }
-}
+};
