@@ -161,7 +161,7 @@ Translator.prototype.Parser = function () {
             if(this.Lexemes[currentLexeme+1][1] == 50 && this.Lexemes[currentLexeme+2][0] == ']') {
                 this.Rules[currentRule].push('array');
                 this.Rules[currentRule].push(this.Lexemes[currentLexeme + 1][0]);
-                this.Source += (' [' + this.Lexemes[currentLexeme + 1][0] + ']'); // Pascal
+                this.Source += (' array[0..' + this.Lexemes[currentLexeme + 1][0] + '] of'); // Pascal
                 currentLexeme += 3;
             } else {
                this.SyntaxErrors.push(['incorrect array size']);
@@ -324,7 +324,7 @@ Translator.prototype.Parser = function () {
                             currentLexeme++;
                         }
                         if (this.Lexemes[currentLexeme][1] == 5) {
-                            this.Source += (';\nelse\nbegin\n'); // Pascal
+                            this.Source += ('\nelse\nbegin\n'); // Pascal
                             this.Rules[operatorRuleIndex].push('else');
                             currentLexeme++;
                             if(this.Lexemes[currentLexeme][0] == '{') {
@@ -638,15 +638,17 @@ Translator.prototype.Parser = function () {
         if (this.Lexemes[currentLexeme][1] == 33 && this.Lexemes[currentLexeme][2] == 0) {
             currentLexeme++;
             this.Rules[conditionRuleIndex].push('!');
-            this.Source += ('not '); // Pascal
+            this.Source += ('(not '); // Pascal
             if(this.condition()){
                 this.Rules[conditionRuleIndex].push('<условие>');
+                this.Source += (')'); // Pascal
                 return true;
             } else {
                 this.SyntaxErrors.push(['no condition operator after \'!\'']);
             }
         } else if (this.Lexemes[currentLexeme][1] == 40  || this.Lexemes[currentLexeme][1] == 50  || this.Lexemes[currentLexeme][1] == 51
                 || this.Lexemes[currentLexeme][1] == 52 || this.Lexemes[currentLexeme][1] == 53 || this.Lexemes[currentLexeme][1] == 18  || this.Lexemes[currentLexeme][1] == 19) {
+            this.Source += ('('); // Pascal
             if(this.Lexemes[currentLexeme][1] == 53) {
                 if(this.Lexemes[currentLexeme][0] == 'true')
                     this.Source += ('True'); // Pascal
@@ -662,6 +664,7 @@ Translator.prototype.Parser = function () {
                     return false
                 }
             }
+            this.Source += (')'); // Pascal
             if(this.Lexemes[currentLexeme][1] == 33) {
                 this.Rules[conditionRuleIndex].push(this.Lexemes[currentLexeme][0]);
                 if(this.Lexemes[currentLexeme][2] == 0) {
@@ -699,6 +702,8 @@ Translator.prototype.Parser = function () {
             if (this.Lexemes[currentLexeme][1] == 31) {
                 if(this.Lexemes[currentLexeme][2] == 5) {
                     this.Source += (' <> '); // Pascal
+                } else if(this.Lexemes[currentLexeme][2] == 0) {
+                    this.Source += (' = '); // Pascal
                 } else {
                     this.Source += (' ' + this.Lexemes[currentLexeme][0] + ' '); // Pascal
                 }
@@ -782,7 +787,7 @@ Translator.prototype.Parser = function () {
             }
         }
         return false;
-    }
+    };
 
     // Проверка граматики < блок функций >
     this.functionBlock = function () {
@@ -808,7 +813,15 @@ Translator.prototype.Parser = function () {
         var functionRuleIndex = currentRule;
         if(this.Lexemes[currentLexeme][1] == 1) {
             isFunc = true;
-            this.Source += ('function ');   // Pascal
+            var returnTypeIndex = currentLexeme;
+            while (this.Lexemes[returnTypeIndex][0] != '{') returnTypeIndex++;
+            returnTypeIndex--;
+            console.log(this.Lexemes[returnTypeIndex][0]);
+            if(this.Lexemes[returnTypeIndex][1] > 11 && this.Lexemes[returnTypeIndex][1] < 16) {
+                this.Source += ('function ');   // Pascal
+            } else {
+                this.Source += ('procedure ');   // Pascal
+            }
             this.Rules[functionRuleIndex].push('func');
             currentLexeme++;
             if(this.Lexemes[currentLexeme][1] == 40) {
@@ -830,6 +843,7 @@ Translator.prototype.Parser = function () {
                         currentLexeme++;
                         if(this.Lexemes[currentLexeme][1] > 11 && this.Lexemes[currentLexeme][1] < 16) {
                             var returnType = this.Lexemes[currentLexeme][1];
+                            this.Source += (' :');   // Pascal
                             if(this.variableType()) {
                                 this.Rules[functionRuleIndex].push('<тип>');
                             }

@@ -14,5 +14,5 @@ func main() {
     fmt.Print("Введите индекс числа из Ряда Фибоначи: ")    
     fmt.Scan(&enteredNumber)    
     fmt.Print("Число Фибоначи")    
-    fmt.Print(fibonacci(enteredNumber))    
+    fmt.Print(fibonacci(enteredNumber + 1))
 }

@@ -1,41 +1,42 @@
-func bubbleSort(array [100]int, length int) {
+func bubbleSort(arr [100]int, length int) {
     var temp, counter int
-    var exit bool
+    var ex bool
     
-    for !exit {
-        exit = true
+    for !ex {
+        ex = true
         counter = 0
         for counter < length-1 {
-            if array[counter] > array[counter+1] {
-                temp = array[counter]
-                array[counter] = array[counter+1]
-                array[counter+1] = temp
-                exit = false
+            if arr[counter] > arr[counter+1] {
+                temp = arr[counter]
+                arr[counter] = arr[counter+1]
+                arr[counter+1] = temp
+                ex = false
             }
             counter = counter + 1
         }
+    }
+	
+	fmt.Print("Отсортированный массив: ")
+    counter = 0
+    for counter < length {
+        fmt.Print(arr[counter])
+        counter = counter + 1
     }
 }
 
 func main() {
     var length, counter int
-    var array [100]int
+    var arr [100]int
     
     counter = 0
     fmt.Print("Введите размер массива: ")
     fmt.Scan(&length)
     fmt.Print("Введите массива: ")
     for counter < length {
-        fmt.Scan(&array[counter])
+        fmt.Scan(&arr[counter])
         counter = counter + 1
     }
     
-    bubbleSort(array, length)
-    
-    fmt.Print("Отсортированный массив: ")
-    counter = 0
-    for counter < length {
-        fmt.Print(array[counter])
-        counter = counter + 1
-    }
+    bubbleSort(arr, length)
+   
 }
