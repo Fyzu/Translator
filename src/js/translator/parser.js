@@ -696,9 +696,7 @@ Translator.prototype.Parser = function () {
             type = variableType(this.Lexemes[currentLexeme][0]);
         } else
             type = this.Lexemes[currentLexeme][1];
-        console.log(type);
         if(this.expression(type)) {
-            console.log(this.Lexemes[currentLexeme][0]);
             if (this.Lexemes[currentLexeme][1] == 31) {
                 if(this.Lexemes[currentLexeme][2] == 5) {
                     this.Source += (' <> '); // Pascal
@@ -816,7 +814,6 @@ Translator.prototype.Parser = function () {
             var returnTypeIndex = currentLexeme;
             while (this.Lexemes[returnTypeIndex][0] != '{') returnTypeIndex++;
             returnTypeIndex--;
-            console.log(this.Lexemes[returnTypeIndex][0]);
             if(this.Lexemes[returnTypeIndex][1] > 11 && this.Lexemes[returnTypeIndex][1] < 16) {
                 this.Source += ('function ');   // Pascal
             } else {

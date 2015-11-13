@@ -56,7 +56,7 @@ String.prototype.isNumber = function (){
         return this.length != 0 && match.length == this.length;
     }
     return false;
-}
+};
 
 // Метод проверяющий, состоит ли строка из апострофов
 String.prototype.isApostrophe = function () {
@@ -65,7 +65,7 @@ String.prototype.isApostrophe = function () {
         return this.length != 0 && match.length == this.length;
     }
     return false;
-}
+};
 
 // Метод проверяющий, состоит ли строка из латинских букв
 String.prototype.isLetter = function () {
@@ -74,12 +74,16 @@ String.prototype.isLetter = function () {
         return this.length != 0 && match.length == this.length;
     }
     return false;
-}
+};
+
+String.prototype.contains = function (str) {
+    return this.indexOf(str) != -1;
+};
 
 // Метод String возвращающий кол-во символов
 String.prototype.count = function (symbol) {
     return (this.match(new RegExp('['+symbol+']',"g")) || []).length;
-}
+};
 
 // Проверяем, есть ли такой item в массиве
 Array.prototype.itemExists = function (item){
@@ -89,9 +93,9 @@ Array.prototype.itemExists = function (item){
         }
     }
     return false;
-}
+};
 
 // Очищение массива
 Array.prototype.clear = function () {
     this.splice(0,this.length);
-}
+};
